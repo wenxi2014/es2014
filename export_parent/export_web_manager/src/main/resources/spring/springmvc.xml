@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!--1. 扫描controller包-->
+    <context:component-scan base-package="cn.itcast.controller"/>
+
+    <!--2. 配置视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/pages/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--3. 注解驱动-->
+    <mvc:annotation-driven conversion-service="conversionServiceFactoryBean"/>
+
+    <!--4. 把静态资源交给默认servlet处理-->
+    <mvc:default-servlet-handler/>
+
+    <!--5. 配置类型转换器的工厂-->
+    <bean id="conversionServiceFactoryBean"
+          class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <!--指定自定义类型转换器-->
+                <ref bean="stringToDateConverter"/>
+            </set>
+        </property>
+    </bean>
+
+    <!--6 开启AOP注解支持-->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+    <!--7 dubbo客户端调用配置-->
+    <!--7.1 配置客户端项目名称(唯一)-->
+    <dubbo:application name="export_web_manager"/>
+    <!--7.2 zookeeper注册中心地址-->
+    <dubbo:registry address="zookeeper://127.0.0.1:2181"></dubbo:registry>
+    <!--7.3 开启dubbo的注解扫描（扫描@Reference注解）-->
+    <dubbo:annotation package="cn.itcast.controller"/>
+</beans>
